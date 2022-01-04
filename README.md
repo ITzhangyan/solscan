@@ -8,5 +8,5 @@ TODOs:
 3. Finish NFT detail
 4. Error checking for wallet vs token addresses
 
-![Demo](https://media.giphy.com/media/bjTRBSkC7qCog5wUyl/giphy.gif)
+![](https://media.giphy.com/media/bjTRBSkC7qCog5wUyl/giphy.gif)
 
