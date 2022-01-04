@@ -1,6 +1,7 @@
 package com.ryancasler.solscan.screens.walletdetails
 
 import android.os.Build.VERSION.SDK_INT
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -128,13 +129,17 @@ fun WalletLoaded(
                 when (walletLoaded.nfts) {
                     is NftState.Loaded -> FlowRow {
                         walletLoaded.nfts.nfts.forEach {
-                            Card(onClick = {
-                                // TODO nav graph not being cool
+                            Card(
+                                onClick = {
+                                    // TODO nav graph not being cool
 //                                navController.navigate(buildNftDetailPath(it.address)) {
 //                                    launchSingleTop = true
 //                                    restoreState = true
 //                                }
-                            }
+                                },
+                                elevation = 0.dp,
+                                border = BorderStroke(0.dp, Color.Transparent),
+                                backgroundColor = Color.Transparent
                             ) {
                                 NonFungibleToken(it)
                             }
