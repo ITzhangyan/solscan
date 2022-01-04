@@ -50,7 +50,7 @@ class WalletDetailViewModel @Inject constructor(
         val tokensWithBalance = list.filter { it.tokenAmount.uiAmount > 0.0 }
 
         val fungibleTokens = tokensWithBalance.filter {
-            it.tokenAmount.decimals > 0
+            it.tokenAmount.decimals > 0 && (it.priceUsdt ?: 0.0) > 0.0
         }
 
         val fungibleTokenUI = fungibleTokens.sortedBy {
