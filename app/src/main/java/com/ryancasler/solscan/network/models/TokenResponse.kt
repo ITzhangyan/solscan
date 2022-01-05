@@ -1,5 +1,7 @@
 package com.ryancasler.solscan.network.models
 
+import com.ryancasler.solscan.core.Lamports
+
 data class Token (
     val tokenAddress: String,
     val tokenAmount: TokenAmount,
@@ -7,7 +9,7 @@ data class Token (
     val tokenName: String,
     val tokenIcon: String,
     val rentEpoch: Long,
-    val lamports: Long,
+    val lamports: Lamports,
     val tokenSymbol: String? = null,
     val priceUsdt: Double? = null
 )

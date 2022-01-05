@@ -7,20 +7,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
-import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.lifecycle.lifecycleScope
-import com.ryancasler.solscan.network.models.SolScanApi
 import com.ryancasler.solscan.screens.SolScanNavGraph
-import com.ryancasler.solscan.ui.theme.MyApplicationTheme
-import com.slack.eithernet.ApiResult
-import com.slack.eithernet.response
-import dagger.hilt.EntryPoint
+import com.ryancasler.solscan.core.theme.MyApplicationTheme
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.launch
-import timber.log.Timber
 
 @OptIn(ExperimentalMaterialApi::class)
 @AndroidEntryPoint

@@ -12,20 +12,24 @@ import androidx.compose.foundation.lazy.LazyScopeMarker
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.Card
 import androidx.compose.material.Divider
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Alignment.Companion.CenterEnd
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
+import androidx.compose.ui.Alignment.Companion.CenterStart
 import androidx.compose.ui.Alignment.Companion.End
 import androidx.compose.ui.Alignment.Companion.Start
+import androidx.compose.ui.Alignment.Companion.TopEnd
+import androidx.compose.ui.Alignment.Companion.TopStart
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -41,7 +45,6 @@ import coil.decode.ImageDecoderDecoder
 import coil.decode.SvgDecoder
 import coil.imageLoader
 import coil.transform.CircleCropTransformation
-import coil.transition.CrossfadeTransition
 import coil.util.CoilUtils
 import com.google.accompanist.flowlayout.FlowRow
 import com.google.accompanist.placeholder.PlaceholderHighlight
@@ -53,8 +56,9 @@ import com.ryancasler.solscan.R
 import com.ryancasler.solscan.core.compose.Animated
 import com.ryancasler.solscan.core.compose.FullScreenLoadingSpinner
 import com.ryancasler.solscan.core.compose.LoadingSpinner
-import com.ryancasler.solscan.screens.SolScanDestinations.buildNftDetailPath
-import com.ryancasler.solscan.ui.theme.Typography
+import com.ryancasler.solscan.core.theme.Typography
+import com.ryancasler.solscan.core.toCurrencyString
+import com.ryancasler.solscan.network.models.MarketDetails
 
 @Composable
 @Preview
@@ -86,29 +90,54 @@ fun WalletLoaded(
         "rrc.sol",
         "$0.00",
         emptyList(),
+        MarketDetails("", 1.1, -100.0),
         NftState.NoNfts
     ), navController: NavController = rememberNavController()
 ) {
     Column {
-        Text(
-            modifier = Modifier
-                .fillMaxWidth()
-                .align(CenterHorizontally)
-                .padding(top = 16.dp, start = 16.dp, end = 16.dp),
-            style = Typography.h6,
-            textAlign = TextAlign.Center,
-            text = walletLoaded.shortAddress
-        )
 
-        Text(
-            modifier = Modifier
-                .align(CenterHorizontally)
-                .fillMaxWidth()
-                .padding(bottom = 16.dp, start = 16.dp, end = 16.dp),
-            style = Typography.subtitle1,
-            textAlign = TextAlign.Center,
-            text = "Token Value: ${walletLoaded.totalValueUSD}"
-        )
+        Box(
+            Modifier.fillMaxWidth()
+                .padding(16.dp)
+        ) {
+            Column(
+                Modifier.align(TopStart)
+            ) {
+                Text(
+                    textAlign = TextAlign.Start,
+                    style = MaterialTheme.typography.h5,
+                    text = walletLoaded.shortAddress
+                )
+
+                Text(
+                    style = Typography.subtitle1,
+                    textAlign = TextAlign.Start,
+                    text = walletLoaded.totalValueUSD
+                )
+            }
+
+            Column(
+                Modifier.align(TopEnd)
+            ) {
+                val solanaDetails = walletLoaded.solanaDetails
+                Text(
+                    style = MaterialTheme.typography.h5,
+                    textAlign = TextAlign.End,
+                    text = "Solana"
+                )
+
+                Text(
+                    textAlign = TextAlign.End,
+                    text = solanaDetails.current_price.toCurrencyString()
+                )
+
+                Text(
+                    style = Typography.subtitle1,
+                    textAlign = TextAlign.End,
+                    text = "24hrs: ${solanaDetails.price_change_percentage_24h}%"
+                )
+            }
+        }
 
         LazyColumn(
             Modifier.padding(start = 8.dp, end = 8.dp)

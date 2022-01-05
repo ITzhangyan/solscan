@@ -1,4 +1,4 @@
-package com.ryancasler.solscan.ui.theme
+package com.ryancasler.solscan.core.theme
 
 import androidx.compose.material.Typography
 import androidx.compose.ui.text.TextStyle

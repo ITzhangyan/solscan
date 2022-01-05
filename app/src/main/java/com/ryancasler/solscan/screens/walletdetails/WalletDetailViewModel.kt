@@ -2,22 +2,19 @@ package com.ryancasler.solscan.screens.walletdetails
 
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ryancasler.solscan.core.toCurrencyString
-import com.ryancasler.solscan.network.models.Nft
-import com.ryancasler.solscan.network.models.SolScanApi
-import com.ryancasler.solscan.network.models.Token
+import com.ryancasler.solscan.network.models.*
 import com.slack.eithernet.ApiResult
-import com.slack.eithernet.response
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
 import javax.inject.Inject
 
 @HiltViewModel
 class WalletDetailViewModel @Inject constructor(
-    private val solScanApi: SolScanApi
+    private val solScanApi: SolScanApi,
+    private val coinGeckoApi: CoinGeckoApi
 ) : ViewModel() {
 
     private var address: String = ""
@@ -43,19 +40,41 @@ class WalletDetailViewModel @Inject constructor(
             }
         }
 
-        processTokens(tokens)
+        val accountInfo = when (val result = solScanApi.getSolAccount(address)) {
+            is ApiResult.Success -> result.value
+            else -> {
+                state.value = WalletDetailState.Error
+                return
+            }
+        }
+
+        val solData = when (val result = coinGeckoApi.getTokenMarket()) {
+            is ApiResult.Success -> result.value
+            else -> {
+                state.value = WalletDetailState.Error
+                return
+            }
+        }
+
+        processTokens(tokens, accountInfo, solData.first())
     }
 
-    private suspend fun processTokens(list: List<Token>) {
+    private suspend fun processTokens(
+        list: List<Token>,
+        accountInfo: AccountDetails,
+        solData: MarketDetails,
+    ) {
+        val solValue = accountInfo.solAmount * solData.current_price
+
         val tokensWithBalance = list.filter { it.tokenAmount.uiAmount > 0.0 }
 
         val fungibleTokens = tokensWithBalance.filter {
             it.tokenAmount.decimals > 0 && (it.priceUsdt ?: 0.0) > 0.0
         }
 
-        val fungibleTokenUI = fungibleTokens.sortedBy {
-            it.tokenAmount.uiAmount
-        }.map {
+        val fungibleTokenUI = fungibleTokens
+            .sortedBy { ((it.priceUsdt ?: 0.0) * it.tokenAmount.uiAmount) }
+            .map {
             FungibleToken(
                 it.tokenName,
                 it.tokenSymbol ?: "",
@@ -64,20 +83,35 @@ class WalletDetailViewModel @Inject constructor(
                 it.priceUsdt?.toCurrencyString() ?: "-",
                 it.tokenIcon
             )
+        }.toMutableList()
+            .apply {
+                add(
+                    0, FungibleToken(
+                        "Solana",
+                        "SOL",
+                        accountInfo.solAmount,
+                        solValue.toCurrencyString(),
+                        solData.current_price.toCurrencyString(),
+                        solData.image
+                    )
+                )
+            }
+            .toList()
+
+        val totalValue = solValue + fungibleTokens.sumOf {
+            ((it.priceUsdt ?: 0.0) * it.tokenAmount.uiAmount)
         }
 
-        val totalValue = fungibleTokens.sumOf {
-            ((it.priceUsdt ?: 0.0) * it.tokenAmount.uiAmount)
-        }.toCurrencyString()
+        val displayValue = totalValue.toCurrencyString()
 
-        state.value = WalletDetailState.Loaded(shortAddress(), address, totalValue, fungibleTokenUI)
+        state.value = WalletDetailState.Loaded(shortAddress(), address, displayValue, fungibleTokenUI, solData)
 
         val nfts = tokensWithBalance.filter { it.tokenAmount.decimals == 0L }
         val loadedNfts = getNFTs(nfts)
         val nftState = if (nfts.isEmpty()) NftState.NoNfts else NftState.Loaded(loadedNfts)
 
         state.value =
-            WalletDetailState.Loaded(shortAddress(), address, totalValue, fungibleTokenUI, nftState)
+            WalletDetailState.Loaded(shortAddress(), address, displayValue, fungibleTokenUI, solData, nftState)
     }
 
     private fun shortAddress(): String {
@@ -133,6 +167,7 @@ sealed class WalletDetailState {
         val accountAddress: String,
         val totalValueUSD: String,
         val tokens: List<FungibleToken>,
+        val solanaDetails: MarketDetails,
         val nfts: NftState = NftState.Loading
     ) : WalletDetailState()
 

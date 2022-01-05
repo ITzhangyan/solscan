@@ -2,12 +2,12 @@ package com.ryancasler.solscan.network.models;
 
 import com.google.gson.*
 import com.google.gson.annotations.SerializedName
+import com.ryancasler.solscan.core.Lamports
 import java.lang.Exception
 import java.lang.reflect.Type
 
-
 data class Nft(
-    val lamports: Long,
+    val lamports: Lamports,
     val ownerProgram: String,
     val type: String,
     val rentEpoch: Long,

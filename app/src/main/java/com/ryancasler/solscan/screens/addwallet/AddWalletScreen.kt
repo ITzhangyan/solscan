@@ -19,8 +19,7 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.ryancasler.solscan.R
 import com.ryancasler.solscan.screens.SolScanDestinations.buildWalletDetailPath
-import com.ryancasler.solscan.ui.theme.Purple700
-import com.ryancasler.solscan.ui.theme.Teal200
+import com.ryancasler.solscan.core.theme.Purple700
 
 @Composable
 @Preview

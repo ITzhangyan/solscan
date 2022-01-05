@@ -5,19 +5,13 @@ import com.ryancasler.solscan.BuildConfig
 import com.slack.eithernet.ApiResult
 import com.slack.eithernet.ApiResultCallAdapterFactory
 import com.slack.eithernet.ApiResultConverterFactory
-import okhttp3.Cache
-import okhttp3.Interceptor
-import okhttp3.OkHttpClient
-import okhttp3.Response
+import okhttp3.*
 import okhttp3.logging.HttpLoggingInterceptor
 import okhttp3.logging.LoggingEventListener
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import retrofit2.http.GET
+import retrofit2.http.*
 import retrofit2.http.Headers
-import retrofit2.http.Path
-import retrofit2.http.Query
-import java.io.IOException
 
 interface SolScanApi {
     /**
@@ -28,6 +22,12 @@ interface SolScanApi {
     suspend fun getAccountTokens(
         @Query("account") account: String
     ): ApiResult<List<Token>, NetworkError>
+
+    @GET("account/{account}")
+    @Headers("Cache-Control: no-cache")
+    suspend fun getSolAccount(
+        @Path("account") address: String
+    ): ApiResult<AccountDetails, NetworkError>
 
     @GET("account/{tokenId}")
     suspend fun getNFTDetail(
@@ -40,6 +40,24 @@ interface SolScanApi {
             .client(defaultHttpClientBuilder(cache).build())
             .build()
             .create(SolScanApi::class.java)
+    }
+}
+
+interface CoinGeckoApi {
+
+    @GET("coins/markets")
+    @Headers("Cache-Control: no-cache")
+    suspend fun getTokenMarket(
+        @Query("vs_currency") vsCurrency: String = "usd",
+        @Query("ids") ids: List<String> = listOf("solana")
+    ): ApiResult<List<MarketDetails>, NetworkError>
+
+    companion object {
+        fun buildClient(cache: Cache): CoinGeckoApi = retrofitBuilder()
+            .baseUrl("https://api.coingecko.com/api/v3/")
+            .client(defaultHttpClientBuilder(cache).build())
+            .build()
+            .create(CoinGeckoApi::class.java)
     }
 }
 

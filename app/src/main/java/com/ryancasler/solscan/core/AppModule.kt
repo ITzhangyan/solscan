@@ -7,6 +7,7 @@ import coil.decode.GifDecoder
 import coil.decode.ImageDecoderDecoder
 import coil.decode.SvgDecoder
 import coil.util.CoilUtils
+import com.ryancasler.solscan.network.models.CoinGeckoApi
 import com.ryancasler.solscan.network.models.SolScanApi
 import com.ryancasler.solscan.network.models.addDebugLogging
 import dagger.Module
@@ -34,4 +35,8 @@ object AppModule {
     @Provides
     @Singleton
     fun provideSolScanApi(cache: Cache) = SolScanApi.buildClient(cache)
+
+    @Provides
+    @Singleton
+    fun provideCoinGeckoApi(cache: Cache) = CoinGeckoApi.buildClient(cache)
 }
