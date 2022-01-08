@@ -60,6 +60,7 @@ import com.ryancasler.solscan.core.theme.Typography
 import com.ryancasler.solscan.core.toCurrencyString
 import com.ryancasler.solscan.network.models.MarketDetails
 import com.ryancasler.solscan.screens.SolScanDestinations.buildNftDetailPath
+import timber.log.Timber
 
 @Composable
 @Preview
@@ -224,13 +225,14 @@ fun NonFungibleToken(
 ) {
     val screenWidth = LocalConfiguration.current.screenWidthDp.dp
     val cardWidth = (screenWidth / 2) - 24.dp
-    val showLoading = remember { mutableStateOf(true) }
 
     Column(
         Modifier
             .padding(8.dp)
             .width(cardWidth)
     ) {
+        val showLoading = remember { mutableStateOf(false) }
+
         Image(
             modifier = Modifier
                 .size(cardWidth)
@@ -241,7 +243,17 @@ fun NonFungibleToken(
             painter = rememberImagePainter(
                 data = token.previewUrl,
                 builder = {
-                    listener(onSuccess = { _, _ -> showLoading.value = false })
+                    listener(
+                        onStart = {
+                            Timber.d("Image_load start")
+                            showLoading.value = true
+                        },
+                        onError = { _, error -> Timber.d("Image_load $error") },
+                        onCancel = { Timber.d("Image_load cancel") },
+                        onSuccess = { _, _ ->
+                            Timber.d("Image_load success")
+                            showLoading.value = false
+                        })
                 }
             ),
             contentDescription = token.name,
