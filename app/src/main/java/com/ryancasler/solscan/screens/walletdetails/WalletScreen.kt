@@ -73,7 +73,8 @@ fun WalletScreen(
     }
 
     Animated(visible = state is WalletDetailState.Loaded) {
-        WalletLoaded(state as WalletDetailState.Loaded, navController)
+        val loaded = state as? WalletDetailState.Loaded ?: return@Animated
+        WalletLoaded(loaded, navController)
     }
 
     Animated(visible = state is WalletDetailState.Error) {
