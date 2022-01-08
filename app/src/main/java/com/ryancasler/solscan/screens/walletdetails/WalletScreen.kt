@@ -59,6 +59,7 @@ import com.ryancasler.solscan.core.compose.LoadingSpinner
 import com.ryancasler.solscan.core.theme.Typography
 import com.ryancasler.solscan.core.toCurrencyString
 import com.ryancasler.solscan.network.models.MarketDetails
+import com.ryancasler.solscan.screens.SolScanDestinations.buildNftDetailPath
 
 @Composable
 @Preview
@@ -98,7 +99,8 @@ fun WalletLoaded(
     Column {
 
         Box(
-            Modifier.fillMaxWidth()
+            Modifier
+                .fillMaxWidth()
                 .padding(16.dp)
         ) {
             Column(
@@ -162,10 +164,10 @@ fun WalletLoaded(
                             Card(
                                 onClick = {
                                     // TODO nav graph not being cool
-//                                navController.navigate(buildNftDetailPath(it.address)) {
-//                                    launchSingleTop = true
-//                                    restoreState = true
-//                                }
+                                    navController.navigate(buildNftDetailPath(it.address)) {
+                                        launchSingleTop = true
+                                        restoreState = true
+                                    }
                                 },
                                 elevation = 0.dp,
                                 border = BorderStroke(0.dp, Color.Transparent),
