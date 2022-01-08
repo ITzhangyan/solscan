@@ -163,7 +163,6 @@ fun WalletLoaded(
                         walletLoaded.nfts.nfts.forEach {
                             Card(
                                 onClick = {
-                                    // TODO nav graph not being cool
                                     navController.navigate(buildNftDetailPath(it.address)) {
                                         launchSingleTop = true
                                         restoreState = true
@@ -223,8 +222,6 @@ fun LazyListScope.header(
 fun NonFungibleToken(
     token: NFT = NFT("Ramp Coin", "", "")
 ) {
-    val imageLoader = LocalContext.current.imageLoader
-
     val screenWidth = LocalConfiguration.current.screenWidthDp.dp
     val cardWidth = (screenWidth / 2) - 24.dp
     val showLoading = remember { mutableStateOf(true) }
@@ -243,7 +240,6 @@ fun NonFungibleToken(
                 ),
             painter = rememberImagePainter(
                 data = token.previewUrl,
-                imageLoader = imageLoader,
                 builder = {
                     listener(onSuccess = { _, _ -> showLoading.value = false })
                 }
@@ -304,30 +300,10 @@ fun FungibleTokenItem(
         Modifier
             .padding(8.dp)
     ) {
-        val context = LocalContext.current
-        val imageLoader = ImageLoader.Builder(context)
-            .crossfade(true)
-            .componentRegistry {
-                add(SvgDecoder(context))
-                if (SDK_INT >= 28) {
-                    add(ImageDecoderDecoder(context))
-                } else {
-                    add(GifDecoder())
-                }
-            }
-            .okHttpClient {
-                OkHttpClient.Builder()
-                    .addDebugLogging()
-                    .cache(CoilUtils.createDefaultCache(context))
-                    .build()
-            }
-            .build()
-
         val painter = if (token.imageUrl.isBlank()) {
             painterResource(id = R.drawable.ic_baseline_broken_image_24)
         } else {
             rememberImagePainter(
-                imageLoader = imageLoader,
                 data = token.imageUrl,
                 builder = {
                     transformations(CircleCropTransformation())
